@@ -108,7 +108,7 @@ namespace :deploy do
 
         set :deploy_to,   "#{deploy_to_base}#{application}"
         set :symfony_env_prod, exists?(:symfony_env) ? symfony_env : stage
-        set :application_url, "http://#{application}.lighthouse.pro" unless exists?(:application_url)
+        set :application_url, "http://#{application}.sellpoint.io" unless exists?(:application_url)
 
         puts "--> Branch ".yellow + "#{branch}".red + " will be used for deploy".yellow
         puts "--> Application will be deployed to ".yellow + application_url.red

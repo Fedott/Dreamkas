@@ -1,6 +1,6 @@
 # api
 server {
-    server_name ~^(?<apihost>.+)\.(?<env>.+?)\.api\.lighthouse\.pro$;
+    server_name ~^(?<apihost>.+)\.(?<env>.+?)\.api\.sellpoint\.io$;
     root /var/www/$apihost.$env.api/current/web;
 
     access_log /var/log/nginx/$apihost.$env.api.access.log;
@@ -47,8 +47,8 @@ server {
 
 # webfront
 server {
-    server_name ~^(?<webfronthost>.+)\.(?<env>.+?)\.webfront\.lighthouse\.pro$;
-    server_name ~^(?<webfronthost>.+(?!\.webfront))\.lighthouse\.pro$;
+    server_name ~^(?<webfronthost>.+)\.(?<env>.+?)\.webfront\.sellpoint\.io$;
+    server_name ~^(?<webfronthost>.+(?!\.webfront))\.sellpoint\.io$;
 
     # auth
     satisfy any;
@@ -60,7 +60,7 @@ server {
     allow 37.200.65.23;
     deny all;
 
-    auth_basic "Dreamkas";
+    auth_basic "Prodavayka";
     auth_basic_user_file htpasswd;
     #end auth
 

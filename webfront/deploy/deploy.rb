@@ -10,12 +10,12 @@ set :deploy_via, :remote_cache_sub_folder
 set :app_end, 'webfront'
 set :deploy_subdir, 'webfront'
 
-set :domain, 'coquille.lighthouse.pro' unless exists?(:domain)
+set :domain, 'sellpoint.io' unless exists?(:domain)
 
 set :shared_children,   []
 
 set :git_enable_pull_requests, true
-set :repository, 'git@github.com:dreamkas/dreamkas.git'
+set :repository, 'git@github.com:Fedott/Dreamkas.git'
 set :scm, :git
 
 set :npm_flag, '--production'

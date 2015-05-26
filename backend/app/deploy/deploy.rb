@@ -10,7 +10,7 @@ set :deploy_via,  :remote_cache_sub_folder
 set :app_end, "api"
 set :application, "api"
 
-set :domain, 'coquille.lighthouse.pro' unless exists?(:domain)
+set :domain, 'sellpoint.io' unless exists?(:domain)
 
 set :deploy_subdir, "backend"
 set :app_path,    "app"
@@ -19,7 +19,7 @@ set :web_path,    "web"
 set :shared_files, [app_path + "/config/parameters.yml"]
 
 set :git_enable_pull_requests, true
-set :repository,  "git@github.com:dreamkas/dreamkas.git"
+set :repository,  "git@github.com:Fedott/Dreamkas.git"
 set :scm,         :git
 
 ssh_options[:forward_agent] = true

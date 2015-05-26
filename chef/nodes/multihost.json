@@ -8,7 +8,7 @@
   ],
   "newrelic": {
     "application_monitoring": {
-      "app_name": "coquille.lighthouse.pro"
+      "app_name": "sellpoint.io"
     }
   }
 }

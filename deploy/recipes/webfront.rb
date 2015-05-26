@@ -26,7 +26,7 @@ namespace :webfront do
         capifony_pretty_print "--> Setup config.js"
         template = File.read(File.join('src', 'config.js.template'))
 
-        api_url = fetch(:api_url, "#{host}.#{stage}.api.lighthouse.pro")
+        api_url = fetch(:api_url, "#{host}.#{stage}.api.sellpoint.io")
         google_analytics_id = fetch(:google_analytics_id, '')
 
         result = ERB.new(template).result(binding)

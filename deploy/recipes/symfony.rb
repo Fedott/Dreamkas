@@ -268,9 +268,6 @@ namespace :symfony do
 
     namespace :apc do
 
-        before "deploy:restart", "symfony:apc:clear"
-        after "deploy:rollback:cleanup", "symfony:apc:clear"
-
         desc "Clear apc cache"
         task :clear do
             capifony_pretty_print "--> Clear apc cache"
