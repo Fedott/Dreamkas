@@ -10,10 +10,12 @@ define(function(require, exports, module) {
     var posWindowReference = null,
         previousPage;
 
-    var openPos = function() {
+    var openPos = function(opt) {
+
+        opt = opt || {};
 
         var posStoreId = cookies.get('posStoreId'),
-            posUrl = '/pos' + (posStoreId ? ('/stores/' + posStoreId) : '');
+            posUrl = opt.posUrl;
 
         if (posWindowReference == null || posWindowReference.closed) {
             /* if the pointer to the window object in memory does not exist
@@ -28,13 +30,38 @@ define(function(require, exports, module) {
              window with the focus() method. There would be no need to re-create
              the window or to reload the referenced resource. */
         }
+
+        posWindowReference.addEventListener("beforeunload", function(e) {
+
+            if (PAGE.resources.firstStart) {
+                PAGE.resources.firstStart.fetch();
+            }
+
+        }, false);
     };
 
     $(document)
         .on('click', '.page__posLink', function(e) {
             e.preventDefault();
 
-            openPos();
+            openPos({
+                posUrl: e.target.href
+            });
+        })
+        .on('click', '.page__tab', function(e) {
+            e.preventDefault();
+
+            var selector = e.currentTarget.getAttribute('rel');
+
+            $(e.currentTarget)
+                .addClass('active')
+                .siblings('.active')
+                .removeClass('active');
+
+            $(selector)
+                .addClass('active')
+                .siblings('.active')
+                .removeClass('active');
         });
 
     return Block.extend({
@@ -43,11 +70,19 @@ define(function(require, exports, module) {
             return document.querySelector('.page') || document.createElement('div');
         },
 
+        params: {},
+
         template: require('ejs!./template.ejs'),
 
         activeNavigationItem: 'main',
 
         currentUserModel: require('resources/currentUser/model.inst'),
+
+        posUrl: function() {
+            var posStoreId = cookies.get('posStoreId');
+
+            return '/pos' + (posStoreId ? ('/stores/' + posStoreId) : '');
+        },
 
         content: function() {
             return '<h1>Добро пожаловать в Lighthouse!</h1>';

@@ -1,10 +1,7 @@
 package ru.dreamkas.jbehave.general;
 
 import net.thucydides.core.annotations.Steps;
-import org.jbehave.core.annotations.Alias;
-import org.jbehave.core.annotations.Given;
-import org.jbehave.core.annotations.Then;
-import org.jbehave.core.annotations.When;
+import org.jbehave.core.annotations.*;
 import org.jbehave.core.model.ExamplesTable;
 import ru.dreamkas.steps.general.GeneralSteps;
 
@@ -49,6 +46,10 @@ public class GeneralEndUserSteps {
     }
 
     @When("пользователь* нажимает на елемент с именем '$name'")
+    @Aliases(values = {
+            "пользователь* нажимает на кнопку с названием '$name'",
+            "пользователь* нажимает на ссылку с названием '$name'"})
+
     public void whenTheUserClicksOnElementWithName(String name) {
         generalSteps.clickOnCommonItemWihName(name);
     }
@@ -85,6 +86,7 @@ public class GeneralEndUserSteps {
     }
 
     @Then("пользователь* проверяет, что элемент с именем '$elementName' должен быть невидимым")
+    @Alias("пользователь* проверяет, что кнопка с названием '$elementName' должна быть невидимой")
     public void thenUserChecksTheElementWithNameShouldBeNotVisible(String elementName) {
         generalSteps.elementShouldBeNotVisible(elementName);
     }
@@ -102,6 +104,11 @@ public class GeneralEndUserSteps {
     @Then("пользователь проверяет, что у элемента с именем '$commonItemName' аттрибут '$attribute' имеет значение '$value'")
     public void thenTheUserChecksCommonItemAttributeValue(String commonItemName, String attribute, String value) {
         generalSteps.assertCommonItemAttributeValue(commonItemName, attribute, value);
+    }
+
+    @Then("пользователь проверяет, что у элемента с именем '$commonItemName' аттрибут '$attribute' содержит значение '$value'")
+    public void thenTheUserChecksCommonItemAttributeContainsValue(String commonItemName, String attribute, String value) {
+        generalSteps.assertCommonItemAttributeContainsValue(commonItemName, attribute, value);
     }
 
     @Then("пользователь проверяет, что у элемента с именем '$commonItemName' css '$cssValue' имеет значение '$value'")

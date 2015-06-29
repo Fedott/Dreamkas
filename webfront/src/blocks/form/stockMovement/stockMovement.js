@@ -4,14 +4,14 @@ define(function(require, exports, module) {
 
     return Form.extend({
         collection: function() {
-            return PAGE.collections.stockMovements;
+            return PAGE.get('collections.stockMovements');
         },
         collections: {
             stores: function() {
-                return PAGE.collections.stores;
+                return PAGE.get('collections.stores');
             },
             suppliers: function(){
-                return PAGE.collections.suppliers;
+                return PAGE.get('collections.suppliers');
             }
         },
         blocks: {

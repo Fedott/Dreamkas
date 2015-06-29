@@ -111,6 +111,9 @@ public class CommonUserSteps {
     }
 
     @When("пользователь переключается на окно браузера с выбором кассы")
+    @Aliases(values = {
+            "пользователь переключается на окно браузера с кассой",
+            "пользователь переключается на новое окно браузера"})
     public void whenUserSwitchesToThePOSWindow() {
         commonSteps.switchToLastWindowHandle();
     }

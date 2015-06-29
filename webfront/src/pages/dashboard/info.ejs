@@ -1,0 +1,79 @@
+<div class="page_dashboard__info">
+
+    <% _.forEach(resources.firstStart.get('stores'), function(storeItem){ %>
+
+    <div class="page_dashboard__infoRow row">
+        <div class="page_dashboard__infoCell col-md-4" name="store">
+
+            <div class="page_dashboard__infoTitle">
+                Магазин:
+            </div>
+            <div class="page_dashboard__infoValue" name="storeName">
+                <%- storeItem.store.name %>
+            </div>
+
+        </div>
+        <div class="page_dashboard__infoCell col-md-4" name="products">
+
+            <% if (typeof storeItem.costOfInventory != 'undefined') { %>
+            <div class="page_dashboard__infoTitle">
+                Товаров в магазине на сумму:
+            </div>
+
+            <div class="page_dashboard__infoValue" name="costOfInventory">
+                <%- formatMoney(storeItem.costOfInventory) %> <i style="font-size: 19px;" class="fa fa-rub"></i>
+            </div>
+            <% } %>
+
+        </div>
+        <div class="page_dashboard__infoCell col-md-4" name="sales">
+
+            <% if (storeItem.sale) { %>
+            <div class="page_dashboard__infoTitle">
+                Продажа:
+            </div>
+            <div class="page_dashboard__infoValue" name="sumTotal">
+                <%- formatMoney(storeItem.sale.receipt.sumTotal) %> <i style="font-size: 19px;" class="fa fa-rub"></i>
+            </div>
+
+            <div class="row" style="padding-top: 30px;">
+
+                <div class="col-md-6">
+                    <div class="page_dashboard__infoSubTitle">
+                        Себестоимость:
+                    </div>
+
+                    <div class="page_dashboard__infoSubValue" name="costOfGoods">
+                        <%- formatMoney(storeItem.sale.costOfGoods) %> <i style="font-size: 14px;" class="fa fa-rub"></i>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="page_dashboard__infoSubTitle">
+                        Прибыль:
+                    </div>
+
+                    <div class="page_dashboard__infoSubValue" name="grossMargin">
+                        <%- formatMoney(storeItem.sale.grossMargin) %> <i style="font-size: 14px;" class="fa fa-rub"></i>
+                    </div>
+                </div>
+
+            </div>
+            <% } %>
+
+        </div>
+    </div>
+
+    <% }) %>
+
+    <% if (PAGE.activeStep == 4 && !resources.firstStart.get('complete')) { %>
+
+    <div style="text-align: center">
+        <a class="btn btn-primary btn-md page_dashboard__finishButton">
+            ПРОДОЛЖИТЬ РАБОТУ
+        </a>
+    </div>
+
+    <% } %>
+</div>
+

@@ -116,3 +116,7 @@ lighthouse.core.order_product:
 lighthouse.core.cash_flow:
     resource: Lighthouse\CoreBundle\Controller\CashFlowController
     type:     rest
+
+lighthouse.core.first-start:
+    resource: Lighthouse\CoreBundle\Controller\FirstStartController
+    type:     rest

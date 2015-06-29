@@ -5,6 +5,8 @@ var webdriverio = require('webdriverio'),
         }
     };
 
+var resemble = require('resemblejs');
+
 if (process.env.seleniumHost){
     options.host = process.env.seleniumHost;
 }
@@ -16,6 +18,14 @@ if (process.env.seleniumPort){
 var browser = webdriverio
     .remote(options)
     .init();
+
+browser.addCommand("screenDiff", function(screen, cb) {
+
+    this.saveScreenshot('screenshots/' + screen, function(err){
+        cb(err);
+    });
+
+});
 
 after(function(done) {
     browser.end(done);

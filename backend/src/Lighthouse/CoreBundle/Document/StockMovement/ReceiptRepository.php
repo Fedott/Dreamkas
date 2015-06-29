@@ -7,9 +7,14 @@ use Doctrine\ODM\MongoDB\Mapping;
 use Lighthouse\CoreBundle\Document\StockMovement\Returne\Returne;
 use Lighthouse\CoreBundle\Document\StockMovement\Sale\Sale;
 use Lighthouse\CoreBundle\Document\StockMovement\Sale\SaleFilter;
+use Lighthouse\CoreBundle\Document\Store\Store;
 use Lighthouse\CoreBundle\Exception\RuntimeException;
 use JMS\DiExtraBundle\Annotation as DI;
 
+/**
+ * @method Receipt find($id, $lockMode = LockMode::NONE, $lockVersion = null)
+ * @method Receipt findOneBy(array $criteria, array $sort = array(), array $hints = array())
+ */
 class ReceiptRepository extends StockMovementRepository
 {
     /**
@@ -100,5 +105,22 @@ class ReceiptRepository extends StockMovementRepository
         $qb->sort('date', self::SORT_DESC);
 
         return $qb->getQuery()->execute();
+    }
+
+    /**
+     * @param Store $store
+     * @return Sale
+     */
+    public function findLastSaleByStore(Store $store)
+    {
+        return $this->findOneBy(
+            array(
+                'type' => Sale::TYPE,
+                'store' => $store->id,
+            ),
+            array(
+                'date' => self::SORT_DESC,
+            )
+        );
     }
 }

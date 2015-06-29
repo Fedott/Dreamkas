@@ -19,7 +19,7 @@ define(function(require) {
 
                     for (var prop in this){
                         if (_.isPlainObject(this[prop])){
-                            this[prop] = _.cloneDeep(this[prop]);
+                            this[prop] = deepExtend({}, this[prop]);
                         }
                     }
 

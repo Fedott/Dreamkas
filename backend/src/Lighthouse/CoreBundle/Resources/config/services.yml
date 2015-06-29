@@ -258,3 +258,13 @@ services:
         parent: doctrine_mongodb.odm.repository
         arguments:
             - LighthouseCoreBundle:CashFlow\CashFlow
+
+    lighthouse.core.document.repository.first_start:
+        parent: doctrine_mongodb.odm.repository
+        arguments:
+            - LighthouseCoreBundle:FirstStart\FirstStart
+        calls:
+            - [setStoreRepository, ["@lighthouse.core.document.repository.store"]]
+            - [setReceiptRepository, ["@lighthouse.core.document.repository.receipt"]]
+            - [setReceiptReportManager, ["@lighthouse.reports.gross_margin_sales.receipt.manager"]]
+            - [setStoreCostOfInventoryRepository, ["@lighthouse.reports.document.cost_of_inventory.store.repository"]]

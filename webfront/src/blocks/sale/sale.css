@@ -13,7 +13,7 @@
     left: 0;
     width: 100%;
     bottom: 0;
-    top: 83px;
+    top: 89px;
     overflow: auto;
     background: #fff;
 }
@@ -21,9 +21,9 @@
 .sale__header {
     padding: 24px 32px;
     border-bottom: 1px solid #eee;
-    height: 34px;
+    height: 40px;
     box-sizing: content-box;
-    line-height: 34px;
+    line-height: 40px;
 }
 
 .sale__title {
@@ -33,7 +33,6 @@
 
 .btn.sale__refundButton {
     float: right;
-    padding: 6px 42px;
 }
 
 .sale__info {

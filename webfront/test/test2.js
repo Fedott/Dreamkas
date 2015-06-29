@@ -21,12 +21,13 @@ describe('Store page with no stores', function() {
             .waitFor('body[status="loaded"]', 5000, done)
     });
     
-    it('Store page', function(done) {
+    it.only('Store page', function(done) {
 
         browser
             .getText('.alert-info', function(err, text){
                 expect(text).to.equal('У вас ещё нет ни одного магазина');
             })
+            .screenDiff('test')
             .call(done);
 
     });

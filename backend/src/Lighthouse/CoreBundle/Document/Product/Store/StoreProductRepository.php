@@ -3,6 +3,7 @@
 namespace Lighthouse\CoreBundle\Document\Product\Store;
 
 use Doctrine\ODM\MongoDB\Cursor;
+use Doctrine\ODM\MongoDB\LockMode;
 use Lighthouse\CoreBundle\Document\Classifier\SubCategory\SubCategory;
 use Lighthouse\CoreBundle\Document\DocumentCollection;
 use Lighthouse\CoreBundle\Document\DocumentRepository;
@@ -18,6 +19,9 @@ use Lighthouse\CoreBundle\Types\Numeric\Money;
 use Lighthouse\CoreBundle\Types\Numeric\NumericFactory;
 use JMS\DiExtraBundle\Annotation as DI;
 
+/**
+ * @method StoreProduct find($id, $lockMode = LockMode::NONE, $lockVersion = null)
+ */
 class StoreProductRepository extends DocumentRepository
 {
     /**

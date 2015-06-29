@@ -14,6 +14,12 @@ define(function(require, exports, module) {
 
                 PAGE.models.receipt = new ReceiptModel();
 
+                if (PAGE.params.firstStart == 1){
+                    PAGE.setParams({
+                        firstStart: 0
+                    })
+                }
+
                 PAGE.render();
             }
         },

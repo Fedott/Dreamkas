@@ -1,6 +1,7 @@
 package ru.dreamkas.steps.general;
 
 import net.thucydides.core.annotations.Step;
+import org.hamcrest.Matchers;
 import org.jbehave.core.model.ExamplesTable;
 import ru.dreamkas.common.item.interfaces.CommonItemType;
 import ru.dreamkas.common.pageObjects.CommonPageObject;
@@ -8,6 +9,7 @@ import ru.dreamkas.common.pageObjects.GeneralPageObject;
 import ru.dreamkas.elements.bootstrap.SimplePreloader;
 import ru.dreamkas.elements.items.SelectByVisibleText;
 import ru.dreamkas.pages.MenuNavigationBar;
+import ru.dreamkas.pages.QuickStartPage;
 import ru.dreamkas.pages.cashFlow.CashFlowListPage;
 import ru.dreamkas.pages.pos.PosLaunchPage;
 import ru.dreamkas.pages.pos.PosPage;
@@ -37,6 +39,7 @@ public class GeneralSteps<T extends GeneralPageObject> extends AbstractGeneralSt
             put("товародвижение", StockMovementPage.class);
             put("выбора кассы", PosLaunchPage.class);
             put("выбранной кассы", PosPage.class);
+            put("кассы", PosPage.class);
             put("истории продаж кассы", PosSaleHistoryPage.class);
             put("чека", ReceiptElement.class);
             put("странице отчетов", ReportsMainPage.class);
@@ -49,6 +52,7 @@ public class GeneralSteps<T extends GeneralPageObject> extends AbstractGeneralSt
             put("списка поставщиков", SupplierListPage.class);
             put("списка магазинов", StoreListPage.class);
             put("списка денежных операций", CashFlowListPage.class);
+            put("быстрого старта", QuickStartPage.class);
         }};
     }
 
@@ -112,6 +116,13 @@ public class GeneralSteps<T extends GeneralPageObject> extends AbstractGeneralSt
         assertThat(
                 getCurrentPageObject().getCommonItemAttributeValue(commonItemName, attribute),
                 is(value));
+    }
+
+    @Step
+    public void assertCommonItemAttributeContainsValue(String commonItemName, String attribute, String value) {
+        assertThat(
+                getCurrentPageObject().getCommonItemAttributeValue(commonItemName, attribute),
+                Matchers.containsString(value));
     }
 
     @Step

@@ -18,8 +18,12 @@ use Lighthouse\CoreBundle\Document\TrialBalance\TrialBalanceRepository;
 use Lighthouse\CoreBundle\Types\Numeric\Money;
 use Lighthouse\CoreBundle\Types\Numeric\NumericFactory;
 use Lighthouse\CoreBundle\Types\Numeric\Quantity;
+use Lighthouse\JobBundle\Job\JobManager;
+use Lighthouse\ReportsBundle\Document\CostOfInventory\Store\StoreCostOfInventoryJob;
+use Lighthouse\ReportsBundle\Document\CostOfInventory\Store\StoreCostOfInventoryRepository;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * @DI\Service("lighthouse.core.document.trial_balance.calculator")
@@ -40,6 +44,16 @@ class CostOfGoodsCalculator
      * @var StoreProductRepository
      */
     protected $storeProductRepository;
+
+    /**
+     * @var StoreCostOfInventoryRepository
+     */
+    protected $storeCostOfInventoryRepository;
+
+    /**
+     * @var ContainerInterface
+     */
+    protected $container;
 
     /**
      * @var array
@@ -64,19 +78,36 @@ class CostOfGoodsCalculator
      *      "trialBalanceRepository" = @DI\Inject("lighthouse.core.document.repository.trial_balance"),
      *      "numericFactory" = @DI\Inject("lighthouse.core.types.numeric.factory"),
      *      "storeProductRepository" = @DI\Inject("lighthouse.core.document.repository.store_product"),
+     *      "storeCostOfInventoryRepository"
+     *          = @DI\Inject("lighthouse.reports.document.cost_of_inventory.store.repository"),
+     *      "container" = @DI\Inject("service_container"),
      * })
      * @param TrialBalanceRepository $trialBalanceRepository
      * @param NumericFactory $numericFactory
      * @param StoreProductRepository $storeProductRepository
+     * @param StoreCostOfInventoryRepository $storeCostOfInventoryRepository
+     * @param ContainerInterface $container
      */
     public function __construct(
         TrialBalanceRepository $trialBalanceRepository,
         NumericFactory $numericFactory,
-        StoreProductRepository $storeProductRepository
+        StoreProductRepository $storeProductRepository,
+        StoreCostOfInventoryRepository $storeCostOfInventoryRepository,
+        ContainerInterface $container
     ) {
         $this->trialBalanceRepository = $trialBalanceRepository;
         $this->numericFactory = $numericFactory;
         $this->storeProductRepository = $storeProductRepository;
+        $this->storeCostOfInventoryRepository = $storeCostOfInventoryRepository;
+        $this->container = $container;
+    }
+
+    /**
+     * @return JobManager
+     */
+    protected function getJobManager()
+    {
+        return $this->container->get('lighthouse.job.manager');
     }
 
     /**
@@ -93,7 +124,7 @@ class CostOfGoodsCalculator
     }
 
     /**
-     * @param $storeProductId
+     * @param string $storeProductId
      * @param Quantity $startIndex
      * @param Quantity $endIndex
      * @return Money
@@ -120,10 +151,14 @@ class CostOfGoodsCalculator
             $costOfGoods = $costOfGoodsDonorPrice->mul($indexQuantity);
             $totalCostOfGoods = $totalCostOfGoods->add($costOfGoods);
             $index = $index->add($indexQuantity);
+
+            $increaseAmountProductTrialBalance->inventory = $increaseAmountProductTrialBalance->quantity->sub(
+                $indexQuantity
+            );
+            $this->trialBalanceRepository->getDocumentManager()->persist($increaseAmountProductTrialBalance);
         }
 
         if ($index->toNumber() < $endIndex->toNumber()) {
-            /** @var StoreProduct $storeProduct */
             $storeProduct = $this->storeProductRepository->find($storeProductId);
             $purchasePrice = $storeProduct->lastPurchasePrice?:$storeProduct->product->purchasePrice;
             $purchasePrice = $purchasePrice?:$this->numericFactory->createQuantity(0);
@@ -162,9 +197,7 @@ class CostOfGoodsCalculator
      */
     public function calculateUnprocessed(OutputInterface $output = null)
     {
-        if (null == $output) {
-            $output = new NullOutput();
-        }
+        $output = ($output) ?: new NullOutput();
         $dotHelper = new DotHelper($output);
 
         $results = $this->trialBalanceRepository->getUnprocessedTrialBalanceGroupStoreProduct(
@@ -195,6 +228,19 @@ class CostOfGoodsCalculator
     }
 
     /**
+     * @param TrialBalance $trialBalance
+     */
+    public function scheduleRecalculateCostOfInventoryByTrialBalance(TrialBalance $trialBalance)
+    {
+        $this->storeCostOfInventoryRepository->markRecalculateNeedByStore($trialBalance->store);
+
+        $job = new StoreCostOfInventoryJob();
+        $job->storeId = $trialBalance->store->id;
+
+        $this->getJobManager()->addJob($job);
+    }
+
+    /**
      *
      * @param string $storeProductId
      * @param array $reasonTypes
@@ -208,6 +254,8 @@ class CostOfGoodsCalculator
 
         if (null != $trialBalance) {
             $this->calculateAndFixRangeIndexesByTrialBalance($trialBalance, $reasonTypes);
+
+            $this->scheduleRecalculateCostOfInventoryByTrialBalance($trialBalance);
         }
     }
 
@@ -341,7 +389,7 @@ class CostOfGoodsCalculator
                 $trialBalance,
                 $reasonTypes
             );
-            if (null != $previousTrialBalance) {
+            if (null !== $previousTrialBalance) {
                 $previousQuantity = $previousTrialBalance->endIndex;
             } else {
                 $previousQuantity = $this->numericFactory->createQuantity(0);
@@ -360,7 +408,6 @@ class CostOfGoodsCalculator
             }
 
             foreach ($allNeedRecalculateTrialBalance as $nextTrialBalance) {
-                /** @var TrialBalance $nextTrialBalance */
                 $nextTrialBalance->startIndex = $previousQuantity;
                 $nextTrialBalance->endIndex = $nextTrialBalance->startIndex->add($nextTrialBalance->quantity);
 

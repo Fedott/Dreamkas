@@ -20,7 +20,11 @@ define(function(require, exports, module) {
         model: function() {
             var StoreModel = require('resources/store/model');
 
-            return PAGE.get('collections.stores').get(this.storeId) || new StoreModel;
+            if (this.storeId != 0){
+                return PAGE.get('collections.stores').get(this.storeId);
+            } else {
+                return new StoreModel;
+            }
         },
         collection: function() {
             return PAGE.get('collections.stores');

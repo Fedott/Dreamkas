@@ -8,7 +8,7 @@ define(function(require, exports, module) {
             'change select[name="store"]': function(e){
                 var page = this;
 
-                page.$('[href^="/pos/stores/"]').attr('href', '/pos/stores/' + e.target.value);
+                page.$('[href^="/pos/stores/"]').attr('href', page.getPosUrl(e.target.value));
             }
         },
         collections: {
@@ -16,6 +16,14 @@ define(function(require, exports, module) {
         },
         blocks: {
             select_stores: require('blocks/select/store/store')
+        },
+        getPosUrl: function(storeId){
+
+            var page = this;
+
+            storeId = storeId || page.collections.stores.at(0).id;
+
+            return '/pos/stores/' + storeId + (page.params.firstStart ? '?firstStart=1' : '');
         }
     });
 });

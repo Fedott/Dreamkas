@@ -122,6 +122,14 @@ class Job extends AbstractDocument
     }
 
     /**
+     * @return bool
+     */
+    public function isPersist()
+    {
+        return true;
+    }
+
+    /**
      *
      */
     public function setNewStatus()
@@ -201,5 +209,24 @@ class Job extends AbstractDocument
     public function getTubeJob()
     {
         return $this->tubeJob;
+    }
+
+    /**
+     * @return array
+     */
+    public function getTubeData()
+    {
+        return array(
+            'jobId' => $this->id,
+            'persist' => $this->isPersist(),
+            'className' => $this->getClassName(),
+        );
+    }
+    /**
+     * @param array $tubeData
+     */
+    public function setDataFromTube(array $tubeData)
+    {
+
     }
 }

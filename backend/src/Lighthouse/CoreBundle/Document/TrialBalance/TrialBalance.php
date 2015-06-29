@@ -11,8 +11,8 @@ use Lighthouse\CoreBundle\Document\Product\Store\StoreProduct;
 use Lighthouse\CoreBundle\Document\StockMovement\StockMovementProduct;
 use Lighthouse\CoreBundle\Document\Store\Store;
 use Lighthouse\CoreBundle\Types\Numeric\Money;
-use DateTime;
 use Lighthouse\CoreBundle\Types\Numeric\Quantity;
+use DateTime;
 
 /**
  * Сальдовая ведомость
@@ -26,11 +26,14 @@ use Lighthouse\CoreBundle\Types\Numeric\Quantity;
  * @property Quantity       $endIndex
  * @property int            $processingStatus
  * @property Quantity       $quantity
- * @property Money          $costOfGoods
- * @property Money          $totalPrice
+ * @property Quantity       $inventory
  * @property Money          $price
+ * @property Money          $totalPrice
+ * @property Money          $costOfGoods
  * @property DateTime       $createdDate
  * @property StoreProduct   $storeProduct
+ * @property Product        $product
+ * @property Store          $store
  * @property StockMovementProduct     $reason
  *
  * @MongoDB\Document(
@@ -108,6 +111,13 @@ class TrialBalance extends AbstractDocument
      * @var float
      */
     protected $quantity;
+
+    /**
+     * Количество непроданных единиц (для приемок)
+     * @MongoDB\Field(type="quantity")
+     * @var float
+     */
+    protected $inventory;
 
     /**
      * @MongoDB\Field(type="money")
@@ -207,5 +217,17 @@ class TrialBalance extends AbstractDocument
         $this->store = $this->storeProduct->store;
         $this->product = $this->storeProduct->product;
         $this->subCategory = $this->reason->product->subCategory;
+    }
+
+    /**
+     * @return Money|null
+     */
+    public function getGrossMargin()
+    {
+        if ($this->costOfGoods && $this->totalPrice) {
+            return $this->totalPrice->sub($this->costOfGoods);
+        } else {
+            return null;
+        }
     }
 }

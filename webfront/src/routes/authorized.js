@@ -3,7 +3,7 @@ define(function(require) {
 
     return {
         //common
-        '(/)': require('pages/main/main'),
+        '(/)': require('pages/dashboard/dashboard'),
         'settings(/)': require('pages/settings/settings'),
         'logout(/)': require('kit/logout/logout'),
 

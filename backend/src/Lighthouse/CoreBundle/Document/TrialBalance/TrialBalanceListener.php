@@ -4,6 +4,7 @@ namespace Lighthouse\CoreBundle\Document\TrialBalance;
 
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Event\OnFlushEventArgs;
+use Doctrine\ODM\MongoDB\Event\PostFlushEventArgs;
 use Doctrine\ODM\MongoDB\UnitOfWork;
 use JMS\DiExtraBundle\Annotation as DI;
 use Lighthouse\CoreBundle\Document\AbstractMongoDBListener;
@@ -11,10 +12,12 @@ use Lighthouse\CoreBundle\Document\StockMovement\Invoice\Invoice;
 use Lighthouse\CoreBundle\Document\Product\Store\StoreProduct;
 use Lighthouse\CoreBundle\Document\Product\Store\StoreProductRepository;
 use Lighthouse\CoreBundle\Document\StockMovement\StockMovementProduct;
+use Lighthouse\CoreBundle\Document\TrialBalance\CostOfGoods\CostOfGoodsCalculateJob;
 use Lighthouse\CoreBundle\Document\TrialBalance\CostOfGoods\CostOfGoodsCalculator;
+use Lighthouse\JobBundle\Job\JobManager;
 
 /**
- * @DI\DoctrineMongoDBListener(events={"onFlush"}, priority=128)
+ * @DI\DoctrineMongoDBListener(events={"onFlush", "postFlush"}, priority=128)
  */
 class TrialBalanceListener extends AbstractMongoDBListener
 {
@@ -34,23 +37,46 @@ class TrialBalanceListener extends AbstractMongoDBListener
     protected $costOfGoodsCalculator;
 
     /**
+     * @var JobManager
+     */
+    protected $jobManager;
+
+    /**
+     * @var array|string[]
+     */
+    protected $scheduledRecalculateStoreProduct = array();
+
+    /**
      * @DI\InjectParams({
      *      "trialBalanceRepository" = @DI\Inject("lighthouse.core.document.repository.trial_balance"),
      *      "storeProductRepository" = @DI\Inject("lighthouse.core.document.repository.store_product"),
-     *      "costOfGoodsCalculator" = @DI\Inject("lighthouse.core.document.trial_balance.calculator")
+     *      "costOfGoodsCalculator" = @DI\Inject("lighthouse.core.document.trial_balance.calculator"),
+     *      "jobManager" = @DI\Inject("lighthouse.job.manager"),
      * })
      * @param TrialBalanceRepository $trialBalanceRepository
      * @param StoreProductRepository $storeProductRepository
      * @param CostOfGoodsCalculator $costOfGoodsCalculator
+     * @param JobManager $jobManager
      */
     public function __construct(
         TrialBalanceRepository $trialBalanceRepository,
         StoreProductRepository $storeProductRepository,
-        CostOfGoodsCalculator $costOfGoodsCalculator
+        CostOfGoodsCalculator $costOfGoodsCalculator,
+        JobManager $jobManager
     ) {
         $this->trialBalanceRepository = $trialBalanceRepository;
         $this->storeProductRepository = $storeProductRepository;
         $this->costOfGoodsCalculator = $costOfGoodsCalculator;
+        $this->jobManager = $jobManager;
+    }
+
+    /**
+     * @param PostFlushEventArgs $eventArgs
+     */
+    public function postFlush(PostFlushEventArgs $eventArgs)
+    {
+        $this->createJobsForScheduledStoreProducts();
+        $this->scheduledRecalculateStoreProduct = array();
     }
 
     /**
@@ -107,6 +133,8 @@ class TrialBalanceListener extends AbstractMongoDBListener
                 $nextProcessedTrialBalance->processingStatus
             );
         }
+
+        $this->scheduleRecalculateStoreProduct($trialBalance->storeProduct);
     }
 
     /**
@@ -137,10 +165,31 @@ class TrialBalanceListener extends AbstractMongoDBListener
                 $needProcessedTrialProduct->processingStatus = TrialBalance::PROCESSING_STATUS_UNPROCESSED;
                 $dm->persist($needProcessedTrialProduct);
                 $this->computeChangeSet($dm, $needProcessedTrialProduct);
+
+                $this->scheduleRecalculateStoreProduct($trialBalance->storeProduct);
             }
         }
 
         $trialBalance->processingStatus = TrialBalance::PROCESSING_STATUS_UNPROCESSED;
+        $this->scheduleRecalculateStoreProduct($trialBalance->storeProduct);
+    }
+
+    /**
+     * @param TrialBalance $trialBalance
+     * @param StockMovementProduct $stockMovementProduct
+     * @param StoreProduct $storeProduct
+     */
+    protected function populateTrialBalanceByStockMovementProduct(
+        TrialBalance $trialBalance,
+        StockMovementProduct $stockMovementProduct,
+        StoreProduct $storeProduct
+    ) {
+        $trialBalance->price = $stockMovementProduct->price;
+        $trialBalance->quantity = $stockMovementProduct->quantity;
+        $trialBalance->inventory = $stockMovementProduct->quantity;
+        $trialBalance->storeProduct = $storeProduct;
+        $trialBalance->reason = $stockMovementProduct;
+        $trialBalance->createdDate = clone $stockMovementProduct->date;
     }
 
     /**
@@ -154,14 +203,12 @@ class TrialBalanceListener extends AbstractMongoDBListener
         $this->computeChangeSet($dm, $storeProduct);
 
         $trialBalance = new TrialBalance();
-        $trialBalance->price = $document->price;
-        $trialBalance->quantity = $document->quantity;
-        $trialBalance->storeProduct = $storeProduct;
-        $trialBalance->reason = $document;
-        $trialBalance->createdDate = $document->date;
+        $this->populateTrialBalanceByStockMovementProduct($trialBalance, $document, $storeProduct);
 
         $dm->persist($trialBalance);
         $this->computeChangeSet($dm, $trialBalance);
+
+        $this->scheduleRecalculateStoreProduct($trialBalance->storeProduct);
     }
     
     /**
@@ -183,15 +230,14 @@ class TrialBalanceListener extends AbstractMongoDBListener
             $this->processSupportsRangeIndexUpdate($trialBalance, $storeProduct, $dm);
         }
 
-        $trialBalance->price = $document->price;
-        $trialBalance->quantity = $document->quantity;
-        $trialBalance->storeProduct = $storeProduct;
-        $trialBalance->createdDate = clone $document->date;
+        $this->populateTrialBalanceByStockMovementProduct($trialBalance, $document, $storeProduct);
 
         $dm->persist($storeProduct);
         $dm->persist($trialBalance);
 
         $this->computeChangeSet($dm, $trialBalance);
+
+        $this->scheduleRecalculateStoreProduct($storeProduct);
     }
 
     /**
@@ -205,6 +251,8 @@ class TrialBalanceListener extends AbstractMongoDBListener
         if ($this->costOfGoodsCalculator->supportsRangeIndex($document)) {
             $this->processSupportsRangeIndexRemove($trialBalance, $dm);
         }
+
+        $this->scheduleRecalculateStoreProduct($trialBalance->storeProduct);
 
         $dm->remove($trialBalance);
     }
@@ -246,6 +294,25 @@ class TrialBalanceListener extends AbstractMongoDBListener
             $trialBalance->createdDate = clone $newAcceptanceDate;
             $trialBalance->processingStatus = TrialBalance::PROCESSING_STATUS_UNPROCESSED;
             $this->computeChangeSet($dm, $trialBalance);
+
+            $this->scheduleRecalculateStoreProduct($trialBalance->storeProduct);
+        }
+    }
+
+    /**
+     * @param StoreProduct $storeProduct
+     */
+    protected function scheduleRecalculateStoreProduct(StoreProduct $storeProduct)
+    {
+        $this->scheduledRecalculateStoreProduct[] = $storeProduct->id;
+    }
+
+    protected function createJobsForScheduledStoreProducts()
+    {
+        foreach ($this->scheduledRecalculateStoreProduct as $storeProductId) {
+            $job = new CostOfGoodsCalculateJob();
+            $job->storeProductId = $storeProductId;
+            $this->jobManager->addJob($job);
         }
     }
 }

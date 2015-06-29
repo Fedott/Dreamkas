@@ -42,8 +42,23 @@
         </div>
         <% } %>
 
+        <% if (PAGE.params.firstStart == 1) { %>
+
+        <p style="padding-bottom: 30px; font-size: 15px;">
+            Вы совершили свою первую продажу.<br />
+            <a target="_blank" data-navigate="0" href="/">Посмотрите результат</a> в отчете.
+        </p>
+
+        <p style="padding-bottom: 30px; font-size: 15px;">
+            Можете <a class="modal_receipt__reloadLink">продолжить работу</a> в кассе.
+        </p>
+
+        <% } else { %>
+
         <p style="padding-bottom: 30px;">
+
             Продажа зарегистрирована
+
         </p>
 
         <div style="padding-bottom: 30px;">
@@ -53,6 +68,7 @@
                 Продолжить работу
             </a>
         </div>
+        <% } %>
     </div>
 
     <% } %>

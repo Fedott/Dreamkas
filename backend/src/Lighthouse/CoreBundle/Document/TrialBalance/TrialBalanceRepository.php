@@ -666,7 +666,7 @@ class TrialBalanceRepository extends DocumentRepository
     /**
      * @param TrialBalance $trialBalance
      * @param array $reasonTypes
-     * @return Cursor
+     * @return Cursor|TrialBalance[]
      */
     public function findByStartTrialBalanceDateStoreProductReasonTypes(TrialBalance $trialBalance, array $reasonTypes)
     {

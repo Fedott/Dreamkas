@@ -7,11 +7,6 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 
 /**
  * @property string $storeProductId
- *
- * @MongoDB\Document(
- *      repositoryClass="Lighthouse\CoreBundle\Job\JobRepository",
- *      collection="Jobs"
- * )
  */
 class CostOfGoodsCalculateJob extends Job
 {
@@ -29,5 +24,33 @@ class CostOfGoodsCalculateJob extends Job
     public function getType()
     {
         return CostOfGoodsCalculateJob::TYPE;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isPersist()
+    {
+        return false;
+    }
+
+    /**
+     * @return array
+     */
+    public function getTubeData()
+    {
+        return array(
+            'storeProductId' => $this->storeProductId,
+        ) + parent::getTubeData();
+    }
+
+    /**
+     * @param array $tubeData
+     */
+    public function setDataFromTube(array $tubeData)
+    {
+        parent::setDataFromTube($tubeData);
+
+        $this->storeProductId = $tubeData['storeProductId'];
     }
 }

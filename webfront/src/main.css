@@ -166,6 +166,10 @@ select.loading, input.loading {
     outline: none !important;
 }
 
+.btn-md {
+    padding: 9px 24px;
+}
+
 .btn-default {
     color: #999999;
     background-color: #efefef;

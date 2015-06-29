@@ -10,17 +10,15 @@ define(function(require, exports, module) {
             store: function(){
                 var StoreModel = require('resources/store/model');
 
-                return PAGE.get('collections.stores').get(this.storeId) || new StoreModel;
+                if (this.storeId != 0){
+                    return PAGE.get('collections.stores').get(this.storeId);
+                } else {
+                    return new StoreModel;
+                }
             }
         },
         blocks: {
-            form_store: function(options) {
-                var Form_store = require('blocks/form/store/store');
-
-                options.storeId = this.storeId;
-
-                return new Form_store(options);
-            }
+            form_store: require('blocks/form/store/store')
         }
     });
 });

@@ -7,6 +7,7 @@ use Lighthouse\JobBundle\Worker\WorkerManager;
 use Lighthouse\JobBundle\Exception\NotFoundJobException;
 use Lighthouse\CoreBundle\Security\Project\ProjectContext;
 use Lighthouse\JobBundle\Document\Job\JobRepository;
+use Pheanstalk_Job;
 use Pheanstalk_PheanstalkInterface as PheanstalkInterface;
 use Pheanstalk_Exception_ServerException as PheanstalkServerException;
 use JMS\DiExtraBundle\Annotation as DI;
@@ -77,13 +78,13 @@ class JobManager
      */
     public function addJob(Job $job)
     {
-        // save job if it was not saved before
-        $this->jobRepository->save($job);
+        $this->saveJobIfNeeded($job);
 
         $jobId = $this->putJobInTube($job);
 
         $job->setPendingStatus($jobId);
-        $this->jobRepository->save($job);
+
+        $this->saveJobIfNeeded($job);
     }
 
     /**
@@ -94,11 +95,11 @@ class JobManager
     {
         $worker = $this->workerManager->getByJob($job);
         $tubeName = $worker->getName();
-        $data = json_encode(array(
-                'jobId' => $job->id,
-                'projectId' => $this->projectContext->getCurrentProject()->getName(),
-            ));
-        return $this->pheanstalk->putInTube($tubeName, $data);
+        $data = $job->getTubeData() + array(
+            'projectId' => $this->projectContext->getCurrentProject()->getName(),
+        );
+        $jsonData = json_encode($data);
+        return $this->pheanstalk->putInTube($tubeName, $jsonData);
     }
 
     /**
@@ -199,7 +200,7 @@ class JobManager
      */
     public function reserveJob($timeout = null)
     {
-        /* @var \Pheanstalk_Job $tubeJob */
+        /* @var Pheanstalk_Job $tubeJob */
         $tubeJob = $this->pheanstalk->reserve($timeout);
         if (!$tubeJob) {
             return null;
@@ -207,31 +208,36 @@ class JobManager
 
         $data = json_decode($tubeJob->getData(), true);
 
-        $jobId = $data['jobId'];
         $projectId = $data['projectId'];
         if (null === $this->projectContext->getCurrentProject()) {
             $this->projectContext->authenticateByProjectName($projectId);
         }
 
-        $job = $this->jobRepository->find($jobId);
-        if (!$job) {
-            $this->logger->critical(
-                sprintf(
-                    'Job #%s from tube was not found in repository by id #%s. Job will be deleted from tube.',
-                    $tubeJob->getId(),
-                    $jobId
-                )
-            );
-            $this->pheanstalk->delete($tubeJob);
-            throw new NotFoundJobException($jobId, $tubeJob->getId());
-        }
+        $job = $this->getJob($tubeJob);
+
         $job->setTubeJob($tubeJob);
 
         $job->setProcessingStatus();
-        $this->jobRepository->save($job);
+        $this->saveJobIfNeeded($job);
 
         if (null === $this->projectContext->getCurrentProject()) {
             $this->projectContext->logout();
+        }
+
+        return $job;
+    }
+
+    /**
+     * @param Pheanstalk_Job $tubeJob
+     * @return Job
+     */
+    public function getJob(Pheanstalk_Job $tubeJob)
+    {
+        $jobData = $this->getJobDataArray($tubeJob);
+        if (isset($jobData['persist']) && $jobData['persist']) {
+            $job = $this->getPersistJob($tubeJob);
+        } else {
+            $job = $this->getNotPersistJob($tubeJob);
         }
 
         return $job;
@@ -249,15 +255,75 @@ class JobManager
             $this->pheanstalk->delete($job->getTubeJob());
 
             $job->setSuccessStatus();
-            $this->jobRepository->save($job);
-
+            $this->saveJobIfNeeded($job);
         } catch (Exception $e) {
             $this->logger->emergency($e);
 
             $this->pheanstalk->delete($job->getTubeJob());
 
             $job->setFailStatus($e->getMessage());
+            $this->saveJobIfNeeded($job);
+        }
+    }
+
+    /**
+     * @param Job $job
+     */
+    protected function saveJobIfNeeded(Job $job)
+    {
+        if ($job->isPersist()) {
             $this->jobRepository->save($job);
         }
+    }
+
+    /**
+     * @param Pheanstalk_Job $tubeJob
+     * @return array
+     */
+    protected function getJobDataArray(Pheanstalk_Job $tubeJob)
+    {
+        return json_decode($tubeJob->getData(), true);
+    }
+
+    /**
+     * @param Pheanstalk_Job $tubeJob
+     * @return Job
+     */
+    protected function getPersistJob(Pheanstalk_Job $tubeJob)
+    {
+        $tubeJobData = $this->getJobDataArray($tubeJob);
+        $jobId = $tubeJobData['jobId'];
+        $job = $this->jobRepository->find($jobId);
+        if (!$job) {
+            $this->logger->critical(
+                sprintf(
+                    'Job #%s from tube was not found in repository by id #%s. Job will be deleted from tube.',
+                    $tubeJob->getId(),
+                    $jobId
+                )
+            );
+            $this->pheanstalk->delete($tubeJob);
+            throw new NotFoundJobException($jobId, $tubeJob->getId());
+        }
+
+        return $job;
+    }
+
+    /**
+     * @param Pheanstalk_Job $tubeJob
+     * @return Job
+     */
+    protected function getNotPersistJob(Pheanstalk_Job $tubeJob)
+    {
+        $tubeJobData = $this->getJobDataArray($tubeJob);
+
+        $jobClassName = $tubeJobData['className'];
+        /** @var Job $job */
+        $job = new $jobClassName;
+
+        $job->setDataFromTube($tubeJobData);
+        $job->jobId = $tubeJob->getId();
+
+        return $job;
     }
 }

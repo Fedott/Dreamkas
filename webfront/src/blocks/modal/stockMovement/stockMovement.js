@@ -47,7 +47,12 @@ define(function(require, exports, module) {
         model: function(){
             var Model = this.Model;
 
-            return PAGE.collections.stockMovements.get(this.itemId) || new Model;
+            if (this.itemId && this.itemId != 0){
+                return PAGE.collections.stockMovements.get(this.itemId);
+            } else {
+                return new Model;
+            }
+
         },
         events: {
             'click .form_stockMovement__removeLink': function(e){
@@ -61,12 +66,12 @@ define(function(require, exports, module) {
             }
         },
         blocks: {
-            form: function(opt){
+            form: function(options){
                 var Form = this.Form;
 
-                return new Form(_.extend({
-                    model: this.model
-                }, opt));
+                options.model = this.model;
+
+                return new Form(options);
             },
             form_products: function(){
                 var Form_products = this.Form_products;

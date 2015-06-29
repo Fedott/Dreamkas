@@ -139,6 +139,22 @@ class ContainerAwareTestCase extends SymfonyWebTestCase
         $jobManager->startWatchingTubes()->purgeTubes()->stopWatchingTubes();
     }
 
+    protected function processedAllJobs()
+    {
+        /* @var JobManager $jobManager */
+        $jobManager = $this->getContainer()->get('lighthouse.job.manager');
+        $jobManager->startWatchingTubes();
+        while (1) {
+            $job = $jobManager->reserveJob(0);
+            if (null == $job) {
+                break;
+            }
+
+            $jobManager->processJob($job);
+        }
+        $jobManager->stopWatchingTubes();
+    }
+
     /**
      * @param string $filePath
      * @return string
