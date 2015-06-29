@@ -1,0 +1,55 @@
+<div class="panel">
+    <div class="panel-heading">Продажи по магазинам на это время</div>
+    <div class="panel-body">
+        <table style="margin-bottom: 0"
+               class="table table_storesGrossSales table-hover table-striped">
+            <thead>
+            <tr>
+                <th>
+                    Магазин
+                </th>
+                <th>
+                    Сегодня, <i class="fa fa-rub"></i>
+                </th>
+                <th>
+                    Вчера, <i class="fa fa-rub"></i>
+                </th>
+                <th>
+                    Неделю назад, <i class="fa fa-rub"></i>
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+
+                <% sortedCollection.forEach(function(item) {
+
+                    var todayValue = item.get('today').now.value;
+                    var yesterdayValue = item.get('yesterday').now.value;
+                    var diff = todayValue - yesterdayValue;
+
+                %>
+
+                <tr name="store">
+                    <td name="name">
+                        <%- item.get('store').name %>
+                    </td>
+                    <td name="today">
+                        <%- formatMoney(todayValue) %>
+                        <div class="table_storesGrossSales__difference"><i class="fa <%- diff >= 0 ? 'fa-arrow-circle-o-up' : 'fa-arrow-circle-o-down' %>"></i>
+                            <span class="table_storesGrossSales__differenceValue"><%- diff >= 0 ? 'больше' : 'меньше' %>, чем вчера</span>
+                        </div>
+                    </td>
+                    <td name="yesterday">
+                        <%- formatMoney(yesterdayValue) %>
+                    </td>
+                    <td name="week_ago">
+                        <%- formatMoney(item.get('weekAgo').now.value) %>
+                    </td>
+                </tr>
+
+                <% }) %>
+
+            </tbody>
+        </table>
+    </div>
+</div>

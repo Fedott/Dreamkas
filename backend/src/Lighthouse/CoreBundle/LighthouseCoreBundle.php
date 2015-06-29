@@ -7,6 +7,7 @@ use Lighthouse\CoreBundle\DependencyInjection\Compiler\AddReferenceProvidersPass
 use Lighthouse\CoreBundle\DependencyInjection\Compiler\AddRoundingsToManagerPass;
 use Lighthouse\CoreBundle\DependencyInjection\Compiler\MongoDBDocumentManagerPass;
 use Lighthouse\CoreBundle\MongoDB\Types\DateTimeTZType;
+use Lighthouse\CoreBundle\MongoDB\Types\DateTimeUTCType;
 use Lighthouse\CoreBundle\MongoDB\Types\MoneyType;
 use Lighthouse\CoreBundle\MongoDB\Types\QuantityType;
 use Lighthouse\CoreBundle\MongoDB\Types\TimestampType;
@@ -32,6 +33,7 @@ class LighthouseCoreBundle extends Bundle
         Type::registerType(MoneyType::NAME, MoneyType::getClassName());
         Type::registerType(TimestampType::NAME, TimestampType::getClassName());
         Type::registerType(DateTimeTZType::NAME, DateTimeTZType::getClassName());
+        Type::registerType(DateTimeUTCType::NAME, DateTimeUTCType::getClassName());
     }
 
     protected function addStreamWrappers()

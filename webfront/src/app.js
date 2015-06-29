@@ -14,8 +14,8 @@ define(function(require) {
 
     getText.dictionary = require('i18n!nls/main');
 
-    moment.lang('root', require('i18n!nls/moment'));
-    moment.lang('root');
+    moment.locale('root', require('i18n!nls/moment'));
+    moment.locale('root');
 
     numeral.language('root', require('i18n!nls/numeral'));
     numeral.language('root');

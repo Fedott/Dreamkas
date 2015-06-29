@@ -10,7 +10,10 @@ use Doctrine\ODM\MongoDB\LockMode;
 use Doctrine\ODM\MongoDB\Proxy\Proxy;
 use Doctrine\MongoDB\Collection;
 use Doctrine\ODM\MongoDB\Types\Type;
+use Lighthouse\CoreBundle\MongoDB\CommandCursor;
 use Lighthouse\CoreBundle\MongoDB\DocumentManager;
+use Lighthouse\CoreBundle\MongoDB\Mapping\ClassMetadata;
+use Doctrine\ODM\MongoDB\Mapping\ClassMetadata as BaseClassMetadata;
 use MongoCollection;
 use MongoId;
 
@@ -137,13 +140,13 @@ class DocumentRepository extends BaseRepository
     }
 
     /**
-     * @param array $ops
+     * @param array $pipeline
      * @return ArrayIterator
      * @throws ResultException
      */
-    protected function aggregate(array $ops)
+    protected function aggregate(array $pipeline)
     {
-        $result = $this->getDocumentCollection()->getMongoCollection()->aggregate($ops);
+        $result = $this->getDocumentCollection()->getMongoCollection()->aggregate($pipeline);
 
         if (empty($result['ok'])) {
             throw new ResultException($result);
@@ -153,6 +156,19 @@ class DocumentRepository extends BaseRepository
         $arrayIterator->setCommandResult($result);
 
         return $arrayIterator;
+    }
+
+    /**
+     * @param array $pipeline
+     * @param BaseClassMetadata $class
+     * @param array $options
+     * @return CommandCursor
+     */
+    protected function aggregateCursor(array $pipeline, BaseClassMetadata $class, array $options = array())
+    {
+        /* @var \MongoCursorInterface $cursor */
+        $mongoCursor = $this->getDocumentCollection()->getMongoCollection()->aggregateCursor($pipeline, $options);
+        return new CommandCursor($mongoCursor, $this->dm->getUnitOfWork(), $class);
     }
 
     /**

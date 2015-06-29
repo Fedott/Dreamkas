@@ -12,7 +12,7 @@ use Lighthouse\CoreBundle\Types\Numeric\Money;
 use Lighthouse\CoreBundle\Types\Numeric\Quantity;
 
 /**
- * @property $id
+ * @property string $id
  * @property DateTime $day
  * @property Money $grossReturn
  * @property Quantity $quantity

@@ -87,12 +87,29 @@ services:
         calls:
             - [setTrialBalanceRepository, ["@lighthouse.core.document.repository.trial_balance"]]
             - [setNumericFactory, ["@lighthouse.core.types.numeric.factory"]]
-            - [setNumericFactory, ["@lighthouse.core.types.numeric.factory"]]
 
     lighthouse.reports.document.cost_of_inventory.store.repository:
         parent: doctrine_mongodb.odm.repository
         arguments:
             - LighthouseReportsBundle:CostOfInventory\Store\StoreCostOfInventory
+        calls:
+            - [setTrialBalanceRepository, ["@lighthouse.core.document.repository.trial_balance"]]
+            - [setNumericFactory, ["@lighthouse.core.types.numeric.factory"]]
+
+    lighthouse.reports.document.gross.hour.network.repository:
+        parent: doctrine_mongodb.odm.repository
+        class: Lighthouse\ReportsBundle\Document\Gross\Hour\Network\GrossHourNetworkRepository
+        arguments:
+            - LighthouseReportsBundle:Gross\Hour\Network\GrossHourNetwork
+        calls:
+            - [setTrialBalanceRepository, ["@lighthouse.core.document.repository.trial_balance"]]
+            - [setNumericFactory, ["@lighthouse.core.types.numeric.factory"]]
+
+    lighthouse.reports.document.gross.hour.store.repository:
+        parent: doctrine_mongodb.odm.repository
+        class: Lighthouse\ReportsBundle\Document\Gross\Hour\Store\GrossHourStoreRepository
+        arguments:
+            - LighthouseReportsBundle:Gross\Hour\Store\GrossHourStore
         calls:
             - [setTrialBalanceRepository, ["@lighthouse.core.document.repository.trial_balance"]]
             - [setNumericFactory, ["@lighthouse.core.types.numeric.factory"]]

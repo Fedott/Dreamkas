@@ -1,0 +1,60 @@
+<div class="row page_dashboard__steps">
+
+    <% var activeStep = PAGE.get('activeStep'); %>
+
+    <div class="col-md-4">
+        <div class="page_dashboard__step <%- activeStep == 1 ? 'page_dashboard__stepActive' : '' %>" name="stores">
+            <div class="page_dashboard__stepNumber">
+                1
+            </div>
+            <div class="page_dashboard__stepTitle">
+                Магазины
+            </div>
+            <div class="page_dashboard__stepDescription">
+                В разделе «Магазины» можно редатировать и создать новые магазины
+            </div>
+
+            <a data-modal="modal_store" class="page_dashboard__stepButton btn btn-primary btn-md">
+                ДОБАВИТЬ МАГАЗИН
+            </a>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="page_dashboard__step <%- activeStep == 2 ? 'page_dashboard__stepActive' : '' %>" name="products">
+            <div class="page_dashboard__stepNumber">
+                2
+            </div>
+            <div class="page_dashboard__stepTitle">
+                Товары
+            </div>
+            <div class="page_dashboard__stepDescription">
+                В этом разделе можно оформить приёмку, оприходование, списание товара.
+            </div>
+
+            <a data-modal="modal_invoice" class="page_dashboard__stepButton btn btn-primary btn-md">
+                ПРИНЯТЬ ТОВАР
+            </a>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="page_dashboard__step <%- activeStep == 3 ? 'page_dashboard__stepActive' : '' %>"  name="sales">
+            <div class="page_dashboard__stepNumber">
+                3
+            </div>
+            <div class="page_dashboard__stepTitle">
+                Продажа
+            </div>
+            <div class="page_dashboard__stepDescription">
+                В этом разделе можно оформить приёмку, оприходование, списание товара.
+            </div>
+
+            <a data-navigate="0" href="<%- get('posUrl') %>" class="page__posLink page_dashboard__stepButton btn btn-primary btn-md">
+                ЗАПУСТИТЬ КАССУ
+            </a>
+        </div>
+    </div>
+
+</div>
+

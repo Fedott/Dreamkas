@@ -7,3 +7,7 @@ select {
 .select_supplier > .input-group {
     width: 100%;
 }
+
+.select_period {
+    width: 280px;
+}

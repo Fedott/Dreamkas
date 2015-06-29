@@ -3,10 +3,10 @@
     <div class="page__title">Обзор</div>
 
     <div class="page__tabs">
-        <a rel=".page_dashboard__firstStartContent" class="page__tab <%- resources.firstStart.data.complete ? '' : 'active' %>">
+        <a href="/firstStart" class="page__tab">
             Быстрый старт
         </a>
-        <a rel=".page_dashboard__statsContent" class="page__tab <%- resources.firstStart.data.complete ? 'active' : '' %>">
+        <a href="/dashboard" class="page__tab active">
             Основная статистика
         </a>
     </div>
@@ -14,26 +14,43 @@
 <!--END TITLE PAGE-->
 
 <!--BEGIN CONTENT-->
-<div class="page__content page__tabContent page_dashboard__firstStartContent <%- resources.firstStart.data.complete ? '' : 'active' %>">
+<div class="page__content page__tabContent">
 
-    <div class="page_dashboard__text">Добро пожаловать!</div>
+    <div class="row">
 
-    <b block="progressbar"></b>
+        <div class="col col-md-6">
 
-    <b block="steps"></b>
+            <b block="grossSales"></b>
 
-    <b block="info"></b>
+        </div>
 
-</div>
+        <div class="col col-md-6">
 
-<div class="page__content page__tabContent page_dashboard__statsContent <%- resources.firstStart.data.complete ? 'active' : '' %>">
+            <b block="grossMargin"></b>
 
-    Статистика
+        </div>
+
+    </div>
+
+    <div class="row">
+
+        <div class="col col-md-12">
+
+            <b block="table_storesGrossSales"></b>
+
+        </div>
+
+    </div>
+
+    <div class="row">
+
+        <div class="col col-md-12">
+
+            <b block="table_topSales"></b>
+
+        </div>
+
+    </div>
 
 </div>
 <!--END CONTENT-->
-
-<!--MODALS-->
-<b block="modal_store"></b>
-<b block="modal_invoice"></b>
-<!--END MODALS-->

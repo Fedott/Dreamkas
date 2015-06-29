@@ -84,17 +84,10 @@
 }
 
 .page__content {
+    display: block;
     padding: 20px 30px 50px;
     position: relative;
     z-index: 10;
-}
-
-.page__tabContent {
-    display: none;
-}
-
-.page__tabContent.active {
-    display: block;
 }
 
 .page__panel {
@@ -139,11 +132,11 @@
     color: #999;
 }
 
-.page_reports__link:hover{
+.page_reports__link:hover {
     background-color: #f4f4f4;
 }
 
-.page_reports__link .fa{
+.page_reports__link .fa {
     font-size: 20px;
     font-weight: bold;
     margin-top: -1px;
@@ -152,9 +145,9 @@
 /*---------------------- profit -----------------------*/
 
 .page_productsProfit__breadcrumbs {
-     font-size: 14px;
-     padding-bottom: 20px;
- }
+    font-size: 14px;
+    padding-bottom: 20px;
+}
 
 .page_productsProfit__breadcrumbsLink:after {
     content: "\f054";
@@ -208,8 +201,7 @@
 .page_pos .row,
 .page_pos .productFinder,
 .page_pos .receipt,
-.page_pos .receiptFinder
-{
+.page_pos .receiptFinder {
     height: 100%;
     position: relative;
 }
@@ -351,15 +343,42 @@
     font-weight: bold;
 }
 
-.page_dashboard__infoSubTitle{
+.page_dashboard__infoSubTitle {
     color: #999;
     font-size: 15px;
     font-weight: bold;
     padding-bottom: 5px;
 }
 
-.page_dashboard__infoSubValue{
+.page_dashboard__infoSubValue {
     color: #999;
     font-size: 16px;
+}
+
+.page_dashboard__value1 {
+    font-weight: bold;
+    font-size: 40px;
+    color: #000;
+    padding-bottom: 10px;
+}
+
+.page_dashboard__value2 {
+    font-weight: bold;
+    font-size: 22px;
+    padding-bottom: 5px;
+}
+
+.page_dashboard__valueHint {
+    font-size: 13px;
+    font-weight: normal;
+    color: #999;
+}
+
+.page_dashboard__valuePlus {
+    color: #00BB9A;
+}
+
+.page_dashboard__valueMinus {
+    color: #FF0000;
 }
 

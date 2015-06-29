@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dreamkas</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+
+    <link rel="stylesheet" href="../src/main.css"/>
+</head>
+
+<body>
+
+<div class="page"></div>
+
+<script src="../src/bower_components/requirejs/require.js"></script>
+<script src="../src/bower_components/jquery/dist/jquery.min.js"></script>
+<script src="../src/require.config.js"></script>
+<script src="diff.js"></script>
+
+<script>
+    require.config({
+        baseUrl: '../src/'
+    });
+
+    require(['kit/block/block'], function(Block){
+        console.log(Block);
+    });
+</script>
+
+</body>
+
+</html>

@@ -66,7 +66,24 @@ define({
 
         return unit ? unitsEnums[unit][format] : '';
     },
-
+    'for last week': function(day) {
+        switch (day) {
+            case 1:
+                return 'прошлый вторник';
+            case 2:
+                return 'прошлую среду';
+            case 3:
+                return 'прошлый четверг';
+            case 4:
+                return 'прошлую пятницу';
+            case 5:
+                return 'прошлую субботу';
+            case 6:
+                return 'прошлое воскресение';
+            default:
+                return 'прошлый понедельник';
+        }
+    },
     'for last day': function(day) {
         switch (day) {
             case 1:

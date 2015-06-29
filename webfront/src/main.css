@@ -228,3 +228,20 @@ select.loading, input.loading {
     margin-bottom: 0;
 }
 
+.panel {
+    border: none;
+}
+
+.panel-heading {
+    border: none;
+    background-color: #fafafa;
+    font-size: 20px;
+    color: #999;
+    font-weight: normal;
+    padding: 15px 25px;
+}
+
+.panel-body {
+    padding: 15px 25px;
+}
+

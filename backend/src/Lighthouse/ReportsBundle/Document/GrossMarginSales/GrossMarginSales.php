@@ -9,57 +9,22 @@ use Lighthouse\CoreBundle\Types\Numeric\Quantity;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use JMS\Serializer\Annotation\Exclude;
 use DateTime;
+use Lighthouse\ReportsBundle\Document\Gross\Gross;
 
 /**
- * @property string         $id
- * @property Money          $grossSales
- * @property Money          $grossMargin
- * @property Money          $costOfGoods
- * @property Quantity       $quantity
  * @property DateTime       $day
  * @property Store          $store
  *
  * @MongoDB\MappedSuperclass
  * @MongoDB\InheritanceType("COLLECTION_PER_CLASS")
  */
-abstract class GrossMarginSales extends AbstractDocument
+abstract class GrossMarginSales extends Gross
 {
-    /**
-     * @MongoDB\Id(strategy="NONE")
-     * @Exclude
-     * @var string
-     */
-    protected $id;
-
     /**
      * @MongoDB\Date
      * @var \DateTime
      */
     protected $day;
-
-    /**
-     * @MongoDB\Field(type="money")
-     * @var Money
-     */
-    protected $grossSales;
-
-    /**
-     * @MongoDB\Field(type="money")
-     * @var Money
-     */
-    protected $grossMargin;
-
-    /**
-     * @MongoDB\Field(type="money")
-     * @var Money
-     */
-    protected $costOfGoods;
-
-    /**
-     * @MongoDB\Field(type="quantity")
-     * @var Quantity
-     */
-    protected $quantity;
 
     /**
      * @MongoDB\ReferenceOne(

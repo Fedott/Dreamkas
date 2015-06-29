@@ -50,7 +50,9 @@ class DateTimeTZTypeTest extends TestCase
                     'second' => 59,
                     'tz' => '+04:00',
                     'offset' => 14400,
-                    'iso' => '2013-01-23T23:59:59+0400'
+                    'iso' => '2013-01-23T23:59:59+0400',
+                    'dayDate' => new MongoDate(1358899200),
+                    'hourDate' => new MongoDate(1358982000)
                 ),
             ),
             '2013-01-23T23:59:59' => array(
@@ -65,7 +67,9 @@ class DateTimeTZTypeTest extends TestCase
                     'second' => 59,
                     'tz' => 'Europe/Moscow',
                     'offset' => 14400,
-                    'iso' => '2013-01-23T23:59:59+0400'
+                    'iso' => '2013-01-23T23:59:59+0400',
+                    'dayDate' => new MongoDate(1358899200),
+                    'hourDate' => new MongoDate(1358982000)
                 ),
             ),
             'null' => array(

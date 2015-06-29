@@ -1,5 +1,5 @@
 window.CONFIG = {
-    version: 46,
+    version: 'us-139',
     baseUrl: 'http://<%= api_url %>',
     baseApiUrl: 'http://<%= api_url %>/api/1',
     clientId: 'webfront_webfront',

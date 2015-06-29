@@ -2,8 +2,10 @@
 
 namespace Lighthouse\CoreBundle\MongoDB\Types;
 
-use DateTime;
+use Lighthouse\CoreBundle\Types\Date\DateTimestamp;
 use MongoDate;
+use DateTime;
+use DateTimeZone;
 
 class DateTimeTZType extends BaseType
 {
@@ -16,6 +18,7 @@ class DateTimeTZType extends BaseType
     public static function convertToMongo($value)
     {
         if ($value instanceof DateTime) {
+            $utc = new DateTimestamp($value->format('Y-m-d\TH:i:s'), new DateTimeZone('UTC'));
             $dbValue = array(
                 'date'   => new MongoDate($value->getTimestamp()),
                 'year'   => (int) $value->format('Y'),
@@ -26,7 +29,9 @@ class DateTimeTZType extends BaseType
                 'second' => (int) $value->format('s'),
                 'tz'     => $value->getTimezone()->getName(),
                 'offset' => $value->getOffset(),
-                'iso'    => $value->format(DateTime::ISO8601)
+                'iso'    => $value->format(DateTime::ISO8601),
+                'dayDate' => $utc->copy()->setTime(0, 0)->getMongoDate(),
+                'hourDate' => $utc->copy()->setMinutes(0)->setSeconds(0)->getMongoDate()
             );
         } else {
             $dbValue = null;

@@ -1,0 +1,9 @@
+<select class="select_period form-control" name="period">
+
+    <% _.forEach(items, function(text, value){ %>
+    <option <%- value === selected && 'selected' %> value="<%- value %>">
+        <%- text %>
+    </option>
+    <% }) %>
+
+</select>

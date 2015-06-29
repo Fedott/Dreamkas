@@ -1,0 +1,30 @@
+<div class="table_topSales panel">
+    <div class="panel-heading">Лидеры продаж</div>
+    <div class="panel-body">
+        <div class="table_topSales__filters">
+            <b block="select_period"></b>
+        </div>
+        <table style="margin-bottom: 0"
+               class="table table-hover table-striped">
+            <tbody>
+
+            <% sortedCollection.forEach(function(item) { %>
+
+            <tr name="product">
+                <td name="name">
+                    <%- item.get('product').name %>
+                </td>
+                <td name="count">
+                    <%- item.get('quantity') %> <%- item.get('product').units %>
+                </td>
+                <td name="amount">
+                    <%- formatMoney(item.get('grossSales')) %> <i class="fa fa-rub"></i>
+                </td>
+            </tr>
+
+            <% }) %>
+
+            </tbody>
+        </table>
+    </div>
+</div>

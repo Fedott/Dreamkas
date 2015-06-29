@@ -7,6 +7,9 @@ use DateTimeZone;
 use MongoDate;
 use MongoTimestamp;
 
+/**
+ * @method DateTimestamp setTime($hour, $minute, $second = 0)
+ */
 class DateTimestamp extends DateTime
 {
     const RFC3339_USEC = 'Y-m-d\TH:i:s.uP';

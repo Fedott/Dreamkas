@@ -143,11 +143,12 @@ define(function(require, exports, module) {
 
             page.trigger(status);
 
-            if (status === 'loading' && window.PAGE) {
+            if (status === 'loading' && window.PAGE && window.PAGE.status === 'loading') {
                 document.body.removeAttribute('status');
             }
 
             setTimeout(function() {
+                page.status = status;
                 document.body.setAttribute('status', status);
             }, 0);
         },
